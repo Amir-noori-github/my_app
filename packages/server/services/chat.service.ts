@@ -28,5 +28,5 @@ export const chatService = {
         id: response.id,
         message: response.output_text
        }; 
-    }
+    },
 }; 
