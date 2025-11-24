@@ -3,6 +3,7 @@ import type { Request, Response } from 'express';
 import dotenv from 'dotenv';
 import OpenAI from 'openai';
 import z from 'zod';
+import { conversationRepository } from './repositories/conversation.repositories';
 
 dotenv.config();
 
@@ -43,19 +44,24 @@ if (!parseResult.success) {
 
   const {prompt, conversationId} = req.body;
 
-  const responses = await client.responses.create ({
-   model: 'gpt-4o-mini',
-   input: prompt,
-   temperature: 0.2,
-   max_output_tokens:100,
-   previous_response_id: conversations.get(conversationId)
-
+  try { 
+     const responses = await client.responses.create ({
+        model: 'gpt-4o-mini',
+        input: prompt,
+        temperature: 0.2,
+        max_output_tokens:100,
+        previous_response_id:conversationRepository.setLastResponseId(conversationId),
   }); 
 
- conversations.set(conversationId, response.id);
-  res.json ({message: responses.output_text})
-})
+       conversationRepository.setLastResponseId(conversationId, response.Id); 
+
+        res.json ({message: responses.output_text}); 
+
+  } catch (error) {
+    res.status(500).json({error: 'Failed to generate a response.'}); 
+
+  }
 
 app.listen(port, () => {
    console.log(`Server is running on http://localhost:${port}`);
-});
+}
