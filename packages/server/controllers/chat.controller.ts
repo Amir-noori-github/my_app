@@ -8,7 +8,7 @@ const chatSchema = z.object({
     .trim()
     .min(1, 'Prompt is required.')
     .max(1000, 'Prompt is too long (max 1000 characters'),
-  conversationId: z.string().uuid()
+  conversationId: z.string().uuid(),
 });
 
 // Public interface
@@ -24,8 +24,7 @@ if (!parseResult.success) {
      const {prompt, conversationId} = req.body;
      const response = await chatService.sendMessage(prompt, conversationId); 
      
-        res.json ({message: response.message}); 
-        
+        res.json ({message: response.message});   
 
   } catch (error) {
     res.status(500).json({error: 'Failed to generate a response.'}); 
